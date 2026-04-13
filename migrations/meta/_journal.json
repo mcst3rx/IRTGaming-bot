@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1755210595032,
+      "tag": "0000_aberrant_doctor_faustus",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1775789714019,
+      "tag": "0001_majestic_vanisher",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775789898636,
+      "tag": "0002_slimy_wraith",
+      "breakpoints": true
+    }
+  ]
+}

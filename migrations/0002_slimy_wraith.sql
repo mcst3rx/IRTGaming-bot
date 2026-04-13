@@ -1,0 +1,1 @@
+ALTER TABLE "playerTimes25" RENAME TO "playerTimes";

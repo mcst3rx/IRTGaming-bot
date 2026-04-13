@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "rootDir": "./src/",
+        "module": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": true,
+        "skipLibCheck": true,
+        "moduleResolution": "nodenext",
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "removeComments": true,
+        "outDir": "dist",
+        "paths": {
+            "#actions": ["./src/actions/index.js"],
+            "#util": ["./src/util/index.js"],
+            "#structures": ["./src/structures/index.js"],
+            "#db": ["./src/db/index.js"],
+            "#typings": ["./src/typings.js"],
+            "#config": ["./src/config.json"]
+        }
+    },
+    "include": ["src"]
+}

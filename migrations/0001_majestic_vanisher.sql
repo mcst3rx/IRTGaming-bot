@@ -1,0 +1,1 @@
+DROP TABLE "playerTimes22" CASCADE;
