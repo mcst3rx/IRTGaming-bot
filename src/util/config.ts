@@ -26,47 +26,19 @@ export function getConfigErrorMessage(error: unknown) {
 export function normalizeConfig(rawConfig: unknown): Config {
     const config = (rawConfig && typeof rawConfig === "object" ? rawConfig : {}) as Record<string, any>;
 
-    config.EMBED_COLOR ??= DEFAULT_EMBED_COLOR;
-    config.EMBED_COLOR_GREEN ??= DEFAULT_EMBED_COLOR_GREEN;
-    config.EMBED_COLOR_RED ??= DEFAULT_EMBED_COLOR_RED;
-    config.EMBED_COLOR_YELLOW ??= DEFAULT_EMBED_COLOR_YELLOW;
-    config.DAILY_MSGS_DEFAULT ??= "";
-    config.DAILY_MSGS_MONDAY ??= "";
-    config.DAILY_MSGS_WEEKEND ??= "";
-    config.MP_TOUCH ??= "";
-    config.PLAYERTIMES_START_DATE ??= "unknown";
     config.devWhitelist = Array.isArray(config.devWhitelist) ? config.devWhitelist : [];
     config.fs = config.fs && typeof config.fs === "object" ? config.fs : {};
     config.resources = config.resources && typeof config.resources === "object" ? config.resources : {};
     config.whitelist = config.whitelist && typeof config.whitelist === "object" ? config.whitelist : {};
     config.whitelist.bannedWords = Array.isArray(config.whitelist.bannedWords) ? config.whitelist.bannedWords : [];
     config.whitelist.logs = Array.isArray(config.whitelist.logs) ? config.whitelist.logs : [];
-    config.ytFeed = config.ytFeed && typeof config.ytFeed === "object" ? config.ytFeed : {};
-    config.ytFeed.channelIds = Array.isArray(config.ytFeed.channelIds) ? config.ytFeed.channelIds : [];
-    config.ytFeed.callback ??= "";
-    config.ytFeed.secret ??= "";
-    config.ytFeed.port ??= 0;
     config.toggles = config.toggles && typeof config.toggles === "object" ? config.toggles : {};
-    config.toggles.commands ??= true;
-    config.toggles.automod ??= false;
-    config.toggles.debug ??= false;
-    config.toggles.logs ??= false;
-    config.toggles.registerCommands ??= false;
-    config.toggles.fsLoop ??= false;
-    config.toggles.ytFeed ??= false;
-    config.toggles.autoResponses ??= false;
-    config.toggles.buttonRoles ??= false;
     config.mainServer = config.mainServer && typeof config.mainServer === "object" ? config.mainServer : {};
-    config.mainServer.id ??= "";
-    config.mainServer.fsLoopMsgId ??= "";
     config.mainServer.mpStaffRoles = Array.isArray(config.mainServer.mpStaffRoles) ? config.mainServer.mpStaffRoles : [];
     config.mainServer.dcStaffRoles = Array.isArray(config.mainServer.dcStaffRoles) ? config.mainServer.dcStaffRoles : [];
     config.mainServer.roles = config.mainServer.roles && typeof config.mainServer.roles === "object" ? config.mainServer.roles : {};
     config.mainServer.channels = config.mainServer.channels && typeof config.mainServer.channels === "object" ? config.mainServer.channels : {};
     config.mainServer.categories = config.mainServer.categories && typeof config.mainServer.categories === "object" ? config.mainServer.categories : {};
-    config.botPresence = config.botPresence && typeof config.botPresence === "object"
-        ? config.botPresence
-        : { status: "online", activities: [{ name: "Configuring bot" }] };
 
     return config as Config;
 }
