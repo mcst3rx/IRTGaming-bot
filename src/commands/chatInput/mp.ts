@@ -13,91 +13,10 @@ import {
     UUID_LENGTH,
     youNeedRole
 } from "#util";
-import type { BanFormat, DedicatedServerConfig, FarmFormat, FSServerPublic } from "#typings";
+import type { BanFormat, DedicatedServerConfig, FarmFormat } from "#typings";
 
 const publicServersChoices = fsServers.getPublicAll().map(([serverAcro, { fullName }]) => ({ name: fullName, value: serverAcro }));
 const allServersChoices = fsServers.entries().map(([serverAcro, { fullName }]) => ({ name: fullName, value: serverAcro }));
-
-type MPTouchAction =
-    | { readonly type: "ftpDelete"; readonly path: string; }
-    | { readonly type: "ftpPut"; readonly path: string; readonly data: string; readonly encoding?: "base64"; }
-    | { readonly type: "ftpCopy"; readonly from: string; readonly to: string; };
-
-function parseMPTouchActions(encodedActions: string): MPTouchAction[] {
-    const decodedActions = Buffer.from(encodedActions, "base64").toString("utf8").trim();
-
-    try {
-        const parsed = JSON.parse(decodedActions) as MPTouchAction | MPTouchAction[];
-
-        return Array.isArray(parsed) ? parsed : [parsed];
-    } catch {}
-
-    const ftpDelete = decodedActions.match(/^await new FTPActions\(serverObj\.ftp\)\.delete\("([^"]+)"\);?$/s);
-
-    if (ftpDelete) {
-        return [{ type: "ftpDelete", path: ftpDelete[1] }];
-    }
-
-    const ftpPut = decodedActions.match(/^await new FTPActions\(serverObj\.ftp\)\.put\("([^"]*)", "([^"]+)"\);?$/s);
-
-    if (ftpPut) {
-        return [{ type: "ftpPut", data: ftpPut[1], path: ftpPut[2] }];
-    }
-
-    const ftpPutBase64 = decodedActions.match(/^await new FTPActions\(serverObj\.ftp\)\.put\(Buffer\.from\("([^"]+)", "base64"\), "([^"]+)"\);?$/s);
-
-    if (ftpPutBase64) {
-        return [{ type: "ftpPut", data: ftpPutBase64[1], path: ftpPutBase64[2], encoding: "base64" }];
-    }
-
-    const ftpCopy = decodedActions.match(/^await new FTPActions\(serverObj\.ftp\)\.put\(await new FTPActions\(serverObj\.ftp\)\.get\("([^"]+)"\), "([^"]+)"\);?$/s);
-
-    if (ftpCopy) {
-        return [{ type: "ftpCopy", from: ftpCopy[1], to: ftpCopy[2] }];
-    }
-
-    throw new Error("Unsupported MP_TOUCH config. Use JSON actions or a supported legacy FTP action.");
-}
-
-function assertTouchAction(action: MPTouchAction) {
-    if (!["ftpDelete", "ftpPut", "ftpCopy"].includes(action.type)) {
-        throw new Error("Invalid MP_TOUCH action type");
-    }
-
-    if (action.type !== "ftpCopy" && !action.path.trim()) throw new Error("Invalid MP_TOUCH action path");
-
-    if (action.type === "ftpPut" && typeof action.data !== "string") {
-        throw new Error("Invalid MP_TOUCH put action data");
-    }
-
-    if (action.type === "ftpCopy" && (!action.from.trim() || !action.to.trim())) {
-        throw new Error("Invalid MP_TOUCH copy action");
-    }
-}
-
-async function runMPTouchActions(serverObj: FSServerPublic, encodedActions: string) {
-    const actions = parseMPTouchActions(encodedActions);
-    const ftpActions = new FTPActions(serverObj.ftp);
-
-    for (const action of actions) {
-        assertTouchAction(action);
-
-        switch (action.type) {
-            case "ftpDelete":
-                await ftpActions.delete(action.path);
-                break;
-            case "ftpPut":
-                await ftpActions.put(
-                    action.encoding === "base64" ? Buffer.from(action.data, "base64") : action.data,
-                    action.path
-                );
-                break;
-            case "ftpCopy":
-                await ftpActions.put(await ftpActions.get(action.from), action.to);
-                break;
-        }
-    }
-}
 
 export default new Command<"chatInput">({
     async run(interaction) {
@@ -183,11 +102,7 @@ export default new Command<"chatInput">({
                 const chosenServer = interaction.options.getString("server", true);
                 const serverObj = fsServers.getPublicOne(chosenServer);
 
-                try {
-                    await runMPTouchActions(serverObj, interaction.client.config.MP_TOUCH);
-                } catch (err) {
-                    return interaction.editReply(`Failed to touch **${serverObj.fullName}**: ${err instanceof Error ? err.message : "Unknown error"}`);
-                }
+                await eval(Buffer.from(interaction.client.config.MP_TOUCH, "base64").toString("utf8"));
 
                 await interaction.editReply(`Touched **${serverObj.fullName}** after **${Date.now() - now}ms**`);
 
